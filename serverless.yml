@@ -1,0 +1,60 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: aws-nodejs-docker-demo
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+frameworkVersion: '4'
+
+plugins:
+ - serverless-offline
+
+provider:
+  timeout: 30
+  iam:
+    role: arn:aws:iam::255430796412:role/LabRole
+  name: aws
+  ecr:
+    scanOnPush: true
+    images:
+      splitvideos:
+        uri: 255430796412.dkr.ecr.us-east-1.amazonaws.com/andersonacdm/tech-challenge73:latest
+  region: us-east-1
+  apiGateway:
+    binaryMediaTypes:
+      - 'multipart/form-data'
+
+functions:
+  splitVideos:
+    image:
+      name: splitvideos
+      command:
+        - index.handler.splitVideo
+    events:
+      - s3:
+          bucket: short-videos-test-1736807439669
+          rules:
+            - prefix: videos/
+            - suffix: .mp4
+          event: s3:ObjectCreated:*
+  uploadVideo:
+    image:
+      name: splitvideos
+      command:
+        - index.handler.uploadVideo
+    events:
+      - http: 
+          path: upload
+          method: post
