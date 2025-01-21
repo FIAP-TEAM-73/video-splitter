@@ -12,7 +12,7 @@ export default [
     ],
     files: ['**/*.js', '**/*.ts'],
     rules: {
-      "max-params": "warn"
+      "max-params": "off"
     }
   },
 ]
