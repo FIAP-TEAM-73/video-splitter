@@ -47,4 +47,35 @@ describe('VideoProcessingRepository', () => {
             expect(mockConnection.getCollection).toHaveBeenCalledWith('video_processing');
         });
     });
+    describe('findByKey', () => {
+        it('Should return a VideoProcessing when it finds by key', async () => {
+            const sut = new VideoProcessingRepository(mockConnection);
+            const videoProcessing = await sut.findByKey('any_bucket_key');
+            expect(mockConnection.getCollection).toHaveBeenCalledWith('video_processing');
+            expect(videoProcessing).toEqual(document);
+        });
+        it('Should return undefined when it does not find by key', async () => {
+            const mockConnectionNotFoundKey = {
+                ...mockConnection,
+                getCollection: jest.fn(async (collection: string) => {
+                    const aggregate = jest.fn(() => ({ toArray: () => Promise.resolve([]) }))
+                    return await Promise.resolve({...mockCollectionMethods, aggregate})
+                })
+            }
+            const sut = new VideoProcessingRepository(mockConnectionNotFoundKey);
+            const videoProcessing = await sut.findByKey('missing_bucket_key');
+            expect(mockConnection.getCollection).toHaveBeenCalledWith('video_processing');
+            expect(videoProcessing).toBeUndefined();
+        });
+        it('Should throw an error when collection throws', async () => {
+            const mockConnectionError = {
+                ...mockConnection,
+                getCollection: jest.fn(async (collection: string) => {
+                    throw new Error('Collection error')
+                })
+            }
+            const sut = new VideoProcessingRepository(mockConnectionError);
+            await expect(sut.findByKey('any_bucket_key')).rejects.toThrow(new Error('Collection error'));
+        });
+    });
 });
