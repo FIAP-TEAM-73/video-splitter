@@ -46,6 +46,16 @@ describe('VideoProcessingRepository', () => {
             await sut.save(document);
             expect(mockConnection.getCollection).toHaveBeenCalledWith('video_processing');
         });
+        it('Should throw an error when collection throws', async () => {
+            const mockConnectionError = {
+                ...mockConnection,
+                getCollection: jest.fn(async (collection: string) => {
+                    throw new Error('Collection error')
+                })
+            }
+            const sut = new VideoProcessingRepository(mockConnectionError);
+            await expect(sut.save(document)).rejects.toThrow(new Error('Collection error'));
+        });
     });
     describe('findByKey', () => {
         it('Should return a VideoProcessing when it finds by key', async () => {
