@@ -1,6 +1,16 @@
-import VideoProcessing from "../../domain/entities/VideoProcessing";
+import VideoProcessing, { VideoProcessingStatus } from "../../domain/entities/VideoProcessing";
 import { IVideoProcessingGateway } from "../../domain/gateways/IVideoProcessingGateway";
+import Email from "../../domain/value-objects/email";
 import IConnection from "../database/IConnection";
+
+interface VideoProcessingDocument {
+    _id: string;
+    email: { value: string };
+    bucketKey: string;
+    interval: number;
+    status: VideoProcessingStatus;
+    zipLink: string;
+}
 
 export default class VideoProcessingRepository implements IVideoProcessingGateway {
 
@@ -9,5 +19,15 @@ export default class VideoProcessingRepository implements IVideoProcessingGatewa
     async save({ bucketKey, ...videoProcessing }: VideoProcessing): Promise<void> {
         const collection = await this.connection.getCollection("video_processing");
         await collection.updateOne({ bucketKey }, { $set: { bucketKey, ...videoProcessing } }, { upsert: true });
+    }
+
+    async findByKey(bucketKey: string): Promise<VideoProcessing | undefined> {
+        const collection = await this.connection.getCollection("video_processing");
+        const result = await collection.aggregate([{ $match: { bucketKey } }]).toArray();
+        if (result.length === 0) return undefined;
+        const videos = result.map(({ email, bucketKey, interval, status, zipLink }: VideoProcessingDocument) => {
+            return new VideoProcessing(new Email(email.value), zipLink, status, bucketKey, interval);
+        });
+        return videos[0];
     }
 }
