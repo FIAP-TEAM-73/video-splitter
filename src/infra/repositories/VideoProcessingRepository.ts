@@ -10,6 +10,8 @@ interface VideoProcessingDocument {
     interval: number;
     status: VideoProcessingStatus;
     zipLink: string;
+    createdAt: number;
+    updatedAt: number;
 }
 
 export default class VideoProcessingRepository implements IVideoProcessingGateway {
@@ -25,8 +27,8 @@ export default class VideoProcessingRepository implements IVideoProcessingGatewa
         const collection = await this.connection.getCollection("video_processing");
         const result = await collection.aggregate([{ $match: { bucketKey } }]).toArray();
         if (result.length === 0) return undefined;
-        const videos = result.map(({ email, bucketKey, interval, status, zipLink }: VideoProcessingDocument) => {
-            return new VideoProcessing(new Email(email.value), zipLink, status, bucketKey, interval);
+        const videos = result.map(({ email, bucketKey, interval, status, zipLink, createdAt, updatedAt }: VideoProcessingDocument) => {
+            return new VideoProcessing(new Email(email.value), zipLink, status, bucketKey, interval, createdAt, updatedAt);
         });
         return videos[0];
     }
@@ -49,8 +51,8 @@ export default class VideoProcessingRepository implements IVideoProcessingGatewa
         const collection = await this.connection.getCollection("video_processing");
         const result = await collection.aggregate(pipeline).toArray();
         if (result.length === 0) return [];
-        const videos = result.map(({ email, bucketKey, interval, status, zipLink }: VideoProcessingDocument) => {
-            return new VideoProcessing(new Email(email.value), zipLink, status, bucketKey, interval);
+        const videos = result.map(({ email, bucketKey, interval, status, zipLink, createdAt, updatedAt }: VideoProcessingDocument) => {
+            return new VideoProcessing(new Email(email.value), zipLink, status, bucketKey, interval, createdAt, updatedAt);
         });
         return videos;
     }

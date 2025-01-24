@@ -10,7 +10,9 @@ export default class VideoProcessing {
         readonly zipLink: string,
         readonly status: VideoProcessingStatus,
         readonly bucketKey: string,
-        readonly interval: number
+        readonly interval: number,
+        readonly createdAt: number = Date.now(),
+        readonly updatedAt: number = Date.now()
     ) { 
         assertArgumentUnionType(status, Object.values(statuses), `Invalid status: ${status}`);
         assertMinNumber(interval, 1);

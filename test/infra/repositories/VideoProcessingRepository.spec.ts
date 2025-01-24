@@ -8,7 +8,9 @@ const document: VideoProcessing = {
     bucketKey: 'any_bucket_key',
     interval: 10,
     status: 'IN_PROGRESS',
-    zipLink: 'any_zip_link'
+    zipLink: 'any_zip_link',
+    createdAt: 1234567890,
+    updatedAt: 1234567890
 }
 
 const anotherDocument: VideoProcessing = {
@@ -16,7 +18,9 @@ const anotherDocument: VideoProcessing = {
     bucketKey: 'another_bucket_key',
     interval: 5,
     status: 'COMPLETED',
-    zipLink: 'any_zip_link'
+    zipLink: 'any_zip_link',
+    createdAt: 1234567890,
+    updatedAt: 1234567890
 }
 
 const mockCollectionMethods = {
