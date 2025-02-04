@@ -55,7 +55,7 @@ provider:
     scanOnPush: true
     images:
       splitvideos:
-        uri: 969036274708.dkr.ecr.us-east-1.amazonaws.com/andersonacdm/video-processing:latest
+        uri: ${param:image_uri}
   region: us-east-1
 
 functions:
