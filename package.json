@@ -1,5 +1,5 @@
 {
-  "name": "aws-nodejs-docker-demo",
+  "name": "video-processing",
   "version": "1.0.0",
   "description": "This project has been generated using the `aws-nodejs-docker` template from the [Serverless framework](https://www.serverless.com/).",
   "main": "app.js",

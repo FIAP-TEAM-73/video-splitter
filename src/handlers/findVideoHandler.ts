@@ -29,14 +29,14 @@ export const findVideoProcessingHandler: Handler = async (event: APIGatewayProxy
 const validateParams = (value: unknown): value is { page: number, size: number, email: string } => {
     if (value === null || typeof value !== 'object') return false;
     if (
-        !('page' in value && typeof value.page === 'number') ||
-        !('size' in value && typeof value.size === 'number') ||
+        !('page' in value) ||
+        !('size' in value) ||
         !('email' in value)) {
         return false
     };
     const { page, size, email } = value;
-    if (!page || page <= 0) return false;
-    if (!size || size <= 0) return false;
+    if (!page || (typeof page === 'string' && isNaN(+page))) return false;
+    if (!size || (typeof size === 'string' && isNaN(+size))) return false;
     if (!email) return false;
     return true
 }

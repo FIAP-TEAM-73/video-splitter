@@ -46,7 +46,7 @@ describe('SplitVideoProcessingUseCase', () => {
         zipFilePath: 'zip/path.zip',
         sourceBucket: 'bucket',
         bucketKey: 'key.mp4',
-        filePath: '/tmp/video.mp4'
+        filePath: '/tmp/video.mp4',
     };
 
     const mockVideoProcessing: VideoProcessing = {
@@ -80,7 +80,8 @@ describe('SplitVideoProcessingUseCase', () => {
         expect(storageMock.put).toHaveBeenCalledWith({ Key: mockInput.zipFilePath, Body: mockFile });
         expect(repositoryMock.save).toHaveBeenCalledWith(expect.objectContaining({
             status: 'COMPLETED',
-            interval: mockInterval
+            interval: mockInterval,
+            zipLink: 'https://bucket.s3.us-east-1.amazonaws.com/zip/path.zip'
         }));
     });
     it('Should throw error when video processing not found', async () => {

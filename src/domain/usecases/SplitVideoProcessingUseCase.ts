@@ -1,9 +1,10 @@
+import { ReadStream } from "fs";
 import IEmail from "../../infra/smtp/IEmail";
 import { IStorage } from "../../infra/storage/IStorage";
 import { createZipFile, readTmpFile, storeTmpFile } from "../../infra/util/file";
 import { IVideo } from "../../infra/video/IVideo";
 import { IVideoProcessingGateway } from "../gateways/IVideoProcessingGateway";
-import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
+import { GetObjectCommandOutput, PutObjectCommandOutput } from '@aws-sdk/client-s3';
 import path from 'path';
 
 type SplitVideoProcessingCommandInput = {
@@ -11,6 +12,7 @@ type SplitVideoProcessingCommandInput = {
     zipFilePath: string,
     bucketKey: string,
     filePath: string,
+    sourceBucket: string
 }
 
 export default class SplitVideoProcessingUseCase {
@@ -21,7 +23,7 @@ export default class SplitVideoProcessingUseCase {
         private readonly mailer: IEmail
     ) { }
 
-    async execute({ bucketKey, outPutFolder, zipFilePath, filePath }: SplitVideoProcessingCommandInput): Promise<void> {
+    async execute({ sourceBucket, bucketKey, outPutFolder, zipFilePath, filePath }: SplitVideoProcessingCommandInput): Promise<void> {
         const videoProcessing = await this.repository.findByKey(bucketKey);
         if (!videoProcessing) throw new Error('Video processing not found');
         try {
@@ -31,8 +33,9 @@ export default class SplitVideoProcessingUseCase {
             await this.storeFrames(filePath, outPutFolder, duration, videoProcessing.interval);
             await createZipFile(outPutFolder, zipFilePath);
             const file = await readTmpFile(zipFilePath);
-            await this.storage.put({ Key: zipFilePath, Body: file });
-            await this.repository.save({ ...videoProcessing, status: 'COMPLETED', updatedAt: Date.now() })
+            await this.storage.put<{ Key: string, Body: ReadStream }, PutObjectCommandOutput>({ Key: zipFilePath, Body: file });
+            const zipLink = this.getZipLink(sourceBucket, zipFilePath);
+            await this.repository.save({ ...videoProcessing, zipLink, status: 'COMPLETED', updatedAt: Date.now() })
         } catch (error) {
             await this.repository.save({ ...videoProcessing, status: 'ERROR', updatedAt: Date.now() })
             await this.mailer.send(
@@ -51,5 +54,9 @@ export default class SplitVideoProcessingUseCase {
             const outputFilePath = path.join(outputFolder, outputFileName);
             await this.video.storeFrames({ frameTime: currentTime, outputPath: outputFilePath, path: filePath });
         }
+    }
+
+    private getZipLink(bucket: string, key: string): string {
+        return `https://${bucket}.s3.us-east-1.amazonaws.com/${key}`;
     }
 }

@@ -15,7 +15,7 @@ export const splitVideoHandler = async (event: S3Event): Promise<void> => {
   try {
     console.log('Processing video from S3:', { sourceBucket, objectKey, outputFolder, zipFilePath, videoPath });
     const useCase = getSplitVideoProcessingUseCase(sourceBucket);
-    await useCase.execute({ bucketKey: objectKey, outPutFolder: outputFolder, zipFilePath, filePath: videoPath });
+    await useCase.execute({ sourceBucket, bucketKey: objectKey, outPutFolder: outputFolder, zipFilePath, filePath: videoPath });
   } catch (error) {
     console.error('Error during processing:', error);
     throw error;
