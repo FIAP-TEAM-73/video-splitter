@@ -144,4 +144,3 @@ jobs:
               --param="smtp_user=${{ env.SMTP_USER }}" \
               --param="smtp_pass=${{ env.SMTP_PASS }}" \
               --param="image_uri=${{ env.FULL_IMAGE }}"
-          entrypoint: /bin/sh
