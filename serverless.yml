@@ -2,8 +2,6 @@ service: processing-videos
 
 frameworkVersion: "4"
 
-plugins:
-  - serverless-offline
 resources:
   Resources:
     UserPool:
@@ -18,7 +16,6 @@ resources:
           PasswordPolicy:
             MinimumLength: 6
         AutoVerifiedAttributes: ["email"]
-
     UserClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
