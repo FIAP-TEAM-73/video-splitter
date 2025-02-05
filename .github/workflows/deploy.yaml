@@ -136,7 +136,6 @@ jobs:
         uses: serverless/github-action@v3.2
         with:
           args: |
-            plugin install --name serverless-offline &&
             serverless deploy --conceal \
               --param="db_user=${{ env.DB_USER }}" \
               --param="db_password=${{ env.DB_PASS }}" \
