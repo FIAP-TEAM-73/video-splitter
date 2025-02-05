@@ -7,7 +7,7 @@ on:
       - main
   pull_request:
 env: 
-  ECR_REPO_NAME: video-processing
+  ECR_REPO_NAME: andersonacdm/video-processing
   DB_USER: ${{ secrets.VIDEO_PROCESSING_DB_USER }}
   DB_PASSWORD: ${{ secrets.VIDEO_PROCESSING_DB_PASSWORD }}
   DB_NAME: ${{ secrets.VIDEO_PROCESSING_DB_NAME }}
