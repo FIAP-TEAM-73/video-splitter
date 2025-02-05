@@ -58,7 +58,7 @@ jobs:
           name: coverage
           path: coverage
       - name: SonarQube Cloud Scan
-        uses: SonarSource/sonarcloud-github-action@v4
+        uses: SonarSource/sonarqube-scan-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -79,11 +79,24 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+      - name: Install tar and xz-utils
+        run: sudo apt-get update && sudo apt-get install -y tar xz-utils
+
       - name: Download FFmpeg
         run: |
           mkdir -p bin
-          curl -L -o bin/ffmpeg https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
-          tar -xvf bin/ffmpeg-release-amd64-static.tar.xz -C bin --strip-components=1
+          curl -L -o bin/ffmpeg-release.tar.xz https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+          
+          echo Verify file exists before extraction
+          if [ ! -f bin/ffmpeg-release.tar.xz ]; then
+            echo "Download failed! Exiting..."
+            exit 1
+          fi
+
+          echo Extract files
+          tar -xvf bin/ffmpeg-release.tar.xz -C bin --strip-components=1
+
+          echo Make FFmpeg executable
           chmod +x bin/ffmpeg
       - name: Splitting branch name
         id: docker-tag
