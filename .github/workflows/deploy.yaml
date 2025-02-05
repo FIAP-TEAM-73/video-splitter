@@ -138,7 +138,7 @@ jobs:
           SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
         with:
           args: |
-            npm install serverless-offline -g &&
+            serverless plugin install --name serverless-offline && \
             serverless deploy --conceal \
               --param="db_user=${{ env.DB_USER }}" \
               --param="db_password=${{ env.DB_PASS }}" \
