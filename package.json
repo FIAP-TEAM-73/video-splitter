@@ -25,7 +25,6 @@
     "git-commit-msg-linter": "^5.0.8",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.1",
-    "serverless-offline": "^14.4.0",
     "ts-jest": "^29.2.5",
     "typescript": "^5.7.3"
   },
@@ -38,6 +37,7 @@
     "fs-extra": "^11.2.0",
     "mongodb": "^6.12.0",
     "nodemailer": "^6.10.0",
-    "parse-multipart-data": "^1.5.0"
+    "parse-multipart-data": "^1.5.0",
+    "serverless-offline": "^14.4.0"
   }
 }
