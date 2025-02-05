@@ -131,7 +131,11 @@ jobs:
             echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
             echo "image_tag=$IMAGE_TAG" 
             echo FULL_IMAGE=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG >> $GITHUB_ENV
-
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+      - run: npm ci && npm i -g serverless
       - name: Install Plugin and Deploy
         uses: serverless/github-action@v4
         env:
