@@ -143,7 +143,7 @@ jobs:
       - name: Debug Environment Variables
         run: |
           echo "DB_USER=${{ env.DB_USER }}"
-          echo "DB_PASS=${{ env.DB_PASS }}"
+          echo "DB_PASSWORD=${{ env.DB_PASSWORD }}"
           echo "DB_NAME=${{ env.DB_NAME }}"
           echo "SMTP_HOST=${{ env.SMTP_HOST }}"
           echo "SMTP_USER=${{ env.SMTP_USER }}"
