@@ -136,19 +136,20 @@ jobs:
         with:
           node-version: 18.x
       - name: Install Dependencies
-        run: npm ci 
-      - name: Install Plugin and Deploy
-        uses: serverless/github-action@v4
-        with:
-          args: |
-            sls help && sls deploy --conceal --debug \
-              --param="db_user=${{ env.DB_USER }}" \
-              --param="db_password=${{ env.DB_PASSWORD }}" \
-              --param="db_name=${{ env.DB_NAME }}" \
-              --param="smtp_host=${{ env.SMTP_HOST }}" \
-              --param="smtp_user=${{ env.SMTP_USER }}" \
-              --param="smtp_pass=${{ env.SMTP_PASS }}" \
-              --param="image_uri=969036274708.dkr.ecr.us-east-1.amazonaws.com/andersonacdm/video-processing:merge"
+        run: npm ci && npm install -g serverless && echo "$(npm root -g)/.bin" >> $GITHUB_PATH
+
+      - name: Check Serverless Version
+        run: serverless --version
+
+      - name: Deploy with Serverless
+        run: serverless deploy --debug --conceal \
+          --param="db_user=${{ env.DB_USER }}" \
+          --param="db_password=${{ env.DB_PASS }}" \
+          --param="db_name=${{ env.DB_NAME }}" \
+          --param="smtp_host=${{ env.SMTP_HOST }}" \
+          --param="smtp_user=${{ env.SMTP_USER }}" \
+          --param="smtp_pass=${{ env.SMTP_PASS }}" \
+          --param="image_uri=969036274708.dkr.ecr.us-east-1.amazonaws.com/andersonacdm/video-processing:merge"
         env:
           SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
