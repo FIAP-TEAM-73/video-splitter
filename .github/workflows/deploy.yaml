@@ -8,6 +8,12 @@ on:
   pull_request:
 env: 
   ECR_REPO_NAME: andersonacdm/video-processing
+  DB_USER: ${{ secrets.VIDEO_PROCESSING_DB_USER }}
+  DB_PASSWORD: ${{ secrets.VIDEO_PROCESSING_DB_PASSWORD }}
+  DB_NAME: ${{ secrets.VIDEO_PROCESSING_DB_NAME }}
+  SMTP_HOST: ${{ secrets.SMTP_HOST }}
+  SMTP_USER: ${{ secrets.SMTP_USER }}
+  SMTP_PASS: ${{ secrets.SMTP_PASS }}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -134,7 +140,15 @@ jobs:
 
       - name: Check Serverless Version
         run: serverless --version
-
+      - name: Debug Environment Variables
+        run: |
+          echo "DB_USER=${{ env.DB_USER }}"
+          echo "DB_PASS=${{ env.DB_PASS }}"
+          echo "DB_NAME=${{ env.DB_NAME }}"
+          echo "SMTP_HOST=${{ env.SMTP_HOST }}"
+          echo "SMTP_USER=${{ env.SMTP_USER }}"
+          echo "SMTP_PASS=${{ env.SMTP_PASS }}"
+          echo "FULL_IMAGE=${{ env.FULL_IMAGE }}"
       - name: Deploy with Serverless
         run: serverless deploy --debug --conceal \
           --param="db_user=${{ env.DB_USER }}" \
@@ -149,9 +163,3 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          DB_USER: ${{ secrets.VIDEO_PROCESSING_DB_USER }}
-          DB_PASSWORD: ${{ secrets.VIDEO_PROCESSING_DB_PASSWORD }}
-          DB_NAME: ${{ secrets.VIDEO_PROCESSING_DB_NAME }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
