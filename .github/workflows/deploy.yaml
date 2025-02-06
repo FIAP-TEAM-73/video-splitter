@@ -141,9 +141,9 @@ jobs:
         uses: serverless/github-action@v4
         with:
           args: |
-            sls deploy --conceal --debug \
+            sls help && sls deploy --conceal --debug \
               --param="db_user=${{ env.DB_USER }}" \
-              --param="db_password=${{ env.DB_PASS }}" \
+              --param="db_password=${{ env.DB_PASSWORD }}" \
               --param="db_name=${{ env.DB_NAME }}" \
               --param="smtp_host=${{ env.SMTP_HOST }}" \
               --param="smtp_user=${{ env.SMTP_USER }}" \
