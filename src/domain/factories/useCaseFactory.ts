@@ -1,3 +1,4 @@
+import { CognitoIdentityProvider } from "@aws-sdk/client-cognito-identity-provider";
 import MongoDBConnection from "../../infra/database/MongoDBConnection";
 import VideoProcessingRepository from "../../infra/repositories/VideoProcessingRepository";
 import { DispachMail } from "../../infra/smtp/DispachMail";
@@ -5,6 +6,10 @@ import S3Storage from "../../infra/storage/S3Storage";
 import FFmpegVideo from "../../infra/video/FFmpegVideo";
 import FindVideoProcessingUseCase from "../usecases/FindVideoProcessingUseCase";
 import SplitVideoProcessingUseCase from "../usecases/SplitVideoProcessingUseCase";
+import { LoginUseCase } from "../usecases/LoginUseCase";
+import { IAuthGateway } from "../gateways/IAuthGateway";
+import { CognitoAuth } from "../../infra/auth/CoginitoAuth";
+import { SignUpUseCase } from "../usecases/SignUpUseCase";
 
 const uri = `mongodb+srv://${process.env.DB_USER ?? 'admin'}:${process.env.DB_PASSWORD ?? 1234}@cluster0.zwrft.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
 
@@ -15,6 +20,16 @@ const videoProcessingMongoRepository = new VideoProcessingRepository(connection)
 const getStorage = (bucket: string) => new S3Storage(bucket)
 
 const videoAdapter = new FFmpegVideo();
+
+const cognito = new CognitoIdentityProvider({})
+
+const getAuthGateway = (): IAuthGateway => {
+    const { user_pool_id: userPoolId, client_id: clientId } = process.env;
+    if (!userPoolId || !clientId) {
+        throw new Error('Following envs are required to use Cognito: user_pool_id and client_id');
+    }
+    return new CognitoAuth(userPoolId, clientId, cognito)
+}
 
 const mailer = new DispachMail({
     host: process.env.SMTP_HOST ?? 'smtp.ethereal.email',
@@ -37,3 +52,7 @@ export const getFindVideoProcessingUseCase = () => {
         videoProcessingMongoRepository
     );
 }
+
+export const getLoginUseCase = (): LoginUseCase => new LoginUseCase(getAuthGateway());
+
+export const getSignUpUseCase = (): SignUpUseCase => new SignUpUseCase(getAuthGateway())
