@@ -1,7 +1,9 @@
-import * as AWS from "aws-sdk"
+import { AuthFlowType, CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import { internalServerError, ok } from "../presenters/HttpResponses";
 
-const cognito = new AWS.CognitoIdentityServiceProvider({ region: 'us-east-1' });
+const cognito = new CognitoIdentityProvider({
+    region: 'us-east-1'
+});
 
 export const loginHandler = async (event: any) => {
     try {
@@ -11,7 +13,7 @@ export const loginHandler = async (event: any) => {
         }
         const { email, password } = JSON.parse(event.body);
         const params = {
-            AuthFlow: 'ADMIN_NO_SRP_AUTH',
+            AuthFlow: AuthFlowType.ADMIN_NO_SRP_AUTH,
             ClientId: clientId,
             UserPoolId: userPoolId,
             AuthParameters: {
@@ -19,7 +21,7 @@ export const loginHandler = async (event: any) => {
                 PASSWORD: password
             }
         };
-        const response = await cognito.adminInitiateAuth(params).promise();
+        const response = await cognito.adminInitiateAuth(params);
         return ok({ token: response.AuthenticationResult?.IdToken });
     } catch (error) {
         return internalServerError('Error while signing up an User', error);

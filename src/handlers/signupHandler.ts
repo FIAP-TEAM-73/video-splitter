@@ -1,7 +1,9 @@
-import * as AWS from "aws-sdk"
+import { CognitoIdentityProvider, MessageActionType } from '@aws-sdk/client-cognito-identity-provider';
 import { internalServerError, noContent } from "../presenters/HttpResponses";
 
-const cognito = new AWS.CognitoIdentityServiceProvider({ region: 'us-east-1' });
+const cognito = new CognitoIdentityProvider({
+    region: 'us-east-1',
+});
 
 export const signupHandler = async (event: any) => {
     try {
@@ -23,9 +25,9 @@ export const signupHandler = async (event: any) => {
                     Value: 'true',
                 }
             ],
-            MessageAction: 'SUPPRESS',
+            MessageAction: MessageActionType.SUPPRESS,
         };
-        const response = await cognito.adminCreateUser(params).promise();
+        const response = await cognito.adminCreateUser(params);
         if (response.User) {
             const paramsForSetPass = {
                 Password: password,
@@ -33,7 +35,7 @@ export const signupHandler = async (event: any) => {
                 Username: email,
                 Permanent: true
             };
-            await cognito.adminSetUserPassword(paramsForSetPass).promise();
+            await cognito.adminSetUserPassword(paramsForSetPass);
         }
         return noContent();
     } catch (error) {
