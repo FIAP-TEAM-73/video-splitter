@@ -4,6 +4,10 @@ frameworkVersion: "4"
 
 resources:
   Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: MyQueue
     UserPool:
       Type: AWS::Cognito::UserPool
       Properties:
@@ -28,6 +32,7 @@ resources:
           - "ADMIN_NO_SRP_AUTH"
 
 provider:
+  runtime: nodejs22.x
   timeout: 30
   environment:
     user_pool_id: { Ref: UserPool }
@@ -47,6 +52,14 @@ provider:
         - cognito-idp:AdminInitiateAuth
         - cognito-idp:AdminSetUserPassword
       Resource: "*"
+    - Effect: Allow
+      Action:
+        - sqs:SendMessage
+        - sqs:ReceiveMessage
+        - sqs:DeleteMessage
+        - sqs:GetQueueAttributes
+      Resource:
+        - "Fn::GetAtt": [ SQSQueue, Arn ] 
   name: aws
   ecr:
     scanOnPush: true
@@ -125,3 +138,16 @@ functions:
                 - Arn
             claims:
               - email
+
+  uploadVideoConsumer:
+    image:
+      name: splitvideos
+      command:
+        - index.handler.uploadVideoConsumer
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - SQSQueue
+              - Arn
+          batchSize: 5
