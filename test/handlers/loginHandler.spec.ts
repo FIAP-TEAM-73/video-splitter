@@ -3,6 +3,7 @@ import { loginHandler } from "../../src/handlers";
 import { badRequest, internalServerError, ok } from "../../src/presenters/HttpResponses";
 
 jest.mock('../../src/domain/factories/useCaseFactory');
+
 const mockEvent = {
     headers: {},
     pathParameters: {},
