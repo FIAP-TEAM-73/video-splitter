@@ -1,16 +1,10 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyResult } from 'aws-lambda';
 import { badRequest, internalServerError, ok } from '../presenters/HttpResponses';
 import { getFindVideoProcessingUseCase } from '../domain/factories/useCaseFactory';
 import { DomainError } from '../domain/base/DomainError';
+import { ApiEventHandler } from './handler.types';
 
-export type EventHandler<T = undefined> = {
-    body?: T;
-    headers: Record<string, string>;
-    pathParameters: Record<string, string> | undefined;
-    queryStringParameters: Record<string, string> | undefined;
-}
-
-export const findVideoProcessingHandler = async (event: EventHandler): Promise<APIGatewayProxyResult> => {
+export const findVideoProcessingHandler = async (event: ApiEventHandler): Promise<APIGatewayProxyResult> => {
     try {
         if (!event.queryStringParameters) {
             return badRequest('Missing query string parameters');

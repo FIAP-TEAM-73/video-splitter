@@ -1,8 +1,8 @@
 import path from 'path';
 import { getSplitVideoProcessingUseCase } from '../domain/factories/useCaseFactory';
-import { S3Event } from 'aws-lambda';
+import { S3EventHandler } from './handler.types';
 
-export const splitVideoHandler = async (event: S3Event): Promise<void> => {
+export const splitVideoHandler = async (event: S3EventHandler): Promise<void> => {
   const [record] = event.Records;
   console.log('Received event:', JSON.stringify(record, null, 2));
 
