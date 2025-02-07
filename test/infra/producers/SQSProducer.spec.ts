@@ -16,7 +16,7 @@ describe('SQSProducer', () => {
         it('Should send an event with success', async () => {
             const event: ProducerEvent = {
                 body: JSON.stringify({ email: 'any_valid@mail.com', name: 'John Doe' }),
-                createAt: Date.now(),
+                createdAt: Date.now(),
                 id: 'any_id'
             }
             mockSqsClient.send.mockImplementation(async () => ({}))
@@ -27,7 +27,7 @@ describe('SQSProducer', () => {
         it('Should throw when SQSClient throws', async () => {
             const event: ProducerEvent = {
                 body: JSON.stringify({ email: 'any_valid@mail.com', name: 'John Doe' }),
-                createAt: Date.now(),
+                createdAt: Date.now(),
                 id: 'any_id'
             }
             mockSqsClient.send.mockImplementation(async () => { throw new Error('Generic SQSClient error') })

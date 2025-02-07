@@ -7,9 +7,10 @@ export type VideoProcessingStatus = typeof statuses[number];
 export default class VideoProcessing {
     constructor(
         readonly email: Email,
-        readonly zipLink: string,
+        readonly zipLink: string | undefined,
+        readonly videoLink: string,
         readonly status: VideoProcessingStatus,
-        readonly bucketKey: string,
+        readonly bucketKey: string | undefined,
         readonly interval: number,
         readonly createdAt: number = Date.now(),
         readonly updatedAt: number = Date.now()

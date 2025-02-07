@@ -56,7 +56,8 @@ describe('SplitVideoProcessingUseCase', () => {
         createdAt: Date.now(),
         email: new Email('valid@mail.com'),
         updatedAt: Date.now(),
-        zipLink: 'zip/path.zip'
+        zipLink: 'zip/path.zip',
+        videoLink: 'zip/path.zip'
     };
 
     it('should process video successfully', async () => {

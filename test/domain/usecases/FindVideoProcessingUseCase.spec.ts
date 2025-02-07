@@ -9,6 +9,7 @@ const document: VideoProcessing = {
     interval: 10,
     status: 'IN_PROGRESS',
     zipLink: 'any_zip_link',
+    videoLink: 'any_zip_link',
     createdAt: 1234567890,
     updatedAt: 1234567890
 }

@@ -1,6 +1,6 @@
 export type ProducerEvent<T = string> = {
     id: string
-    createAt: number
+    createdAt: number
     body: T
 }
 
