@@ -7,7 +7,7 @@ resources:
     SQSQueue:
       Type: AWS::SQS::Queue
       Properties:
-        QueueName: MyQueue
+        QueueName: download-video-queue
     UserPool:
       Type: AWS::Cognito::UserPool
       Properties:
@@ -35,14 +35,16 @@ provider:
   runtime: nodejs22.x
   timeout: 30
   environment:
-    user_pool_id: { Ref: UserPool }
-    client_id: { Ref: UserClient }
+    USER_POOL_ID: { Ref: UserPool }
+    CLIENT_ID: { Ref: UserClient }
+    QUEUE: { Ref: SQSQueue }
     DB_USER: ${param:db_user}
     DB_PASSWORD: ${param:db_password}
     DB_NAME: ${param:db_name}
     SMTP_HOST: ${param:smtp_host}
     SMTP_USER: ${param:smtp_user}
     SMTP_PASS: ${param:smtp_pass}
+    BUCKET_NAME: short-videos-test-1736807439669
   iam:
     role: arn:aws:iam::969036274708:role/LabRole
   iamRoleStatements:

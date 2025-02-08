@@ -35,9 +35,9 @@ export default class SplitVideoProcessingUseCase {
             const file = await readTmpFile(zipFilePath);
             await this.storage.put<{ Key: string, Body: ReadStream }, PutObjectCommandOutput>({ Key: zipFilePath, Body: file });
             const zipLink = this.getZipLink(sourceBucket, zipFilePath);
-            await this.repository.save({ ...videoProcessing, zipLink, status: 'COMPLETED', updatedAt: Date.now() })
+            await this.repository.save(videoProcessing.turnToCompleted(zipLink))
         } catch (error) {
-            await this.repository.save({ ...videoProcessing, status: 'ERROR', updatedAt: Date.now() })
+            await this.repository.save(videoProcessing.turnToError())
             await this.mailer.send(
                 videoProcessing.email.value,
                 'Error processing video',

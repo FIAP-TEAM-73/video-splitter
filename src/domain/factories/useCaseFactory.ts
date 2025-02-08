@@ -10,6 +10,10 @@ import { LoginUseCase } from "../usecases/LoginUseCase";
 import { IAuthGateway } from "../gateways/IAuthGateway";
 import { CognitoAuth } from "../../infra/auth/CoginitoAuth";
 import { SignUpUseCase } from "../usecases/SignUpUseCase";
+import { UploadVideoProcessingUseCase } from "../usecases/UploadVideoProcessingUseCase";
+import SQSProducer from "../../infra/producers/SQSProducer";
+import { SQSClient } from "@aws-sdk/client-sqs";
+import { DownloadVideoProcessingUseCase } from "../usecases/DownloadVideoProcessingUseCase";
 
 const uri = `mongodb+srv://${process.env.DB_USER ?? 'admin'}:${process.env.DB_PASSWORD ?? 1234}@cluster0.zwrft.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
 
@@ -23,10 +27,12 @@ const videoAdapter = new FFmpegVideo();
 
 const cognito = new CognitoIdentityProvider({})
 
+const producer = new SQSProducer(process.env.QUEUE ?? 'download-video-queue', new SQSClient());
+
 const getAuthGateway = (): IAuthGateway => {
-    const { user_pool_id: userPoolId, client_id: clientId } = process.env;
+    const { USER_POOL_ID: userPoolId, CLIENT_ID: clientId } = process.env;
     if (!userPoolId || !clientId) {
-        throw new Error('Following envs are required to use Cognito: user_pool_id and client_id');
+        throw new Error('Following envs are required to use Cognito: USER_POOL_ID and CLIENT_ID');
     }
     return new CognitoAuth(userPoolId, clientId, cognito)
 }
@@ -56,3 +62,7 @@ export const getFindVideoProcessingUseCase = () => {
 export const getLoginUseCase = (): LoginUseCase => new LoginUseCase(getAuthGateway());
 
 export const getSignUpUseCase = (): SignUpUseCase => new SignUpUseCase(getAuthGateway())
+
+export const getUploadVideoProcessingUseCase = (): UploadVideoProcessingUseCase => new UploadVideoProcessingUseCase(videoProcessingMongoRepository, producer);
+
+export const getDownloadVideoProcessingUseCase = (bucket: string): DownloadVideoProcessingUseCase => new DownloadVideoProcessingUseCase(videoProcessingMongoRepository, getStorage(bucket))

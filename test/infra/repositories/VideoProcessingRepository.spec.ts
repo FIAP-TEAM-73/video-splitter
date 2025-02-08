@@ -3,27 +3,27 @@ import Email from "../../../src/domain/value-objects/email";
 import IConnection from "../../../src/infra/database/IConnection";
 import VideoProcessingRepository from "../../../src/infra/repositories/VideoProcessingRepository";
 
-const document: VideoProcessing = {
-    email: new Email('any_valid@mail.com'),
-    bucketKey: 'any_bucket_key',
-    interval: 10,
-    status: 'IN_PROGRESS',
-    zipLink: 'any_zip_link',
-    videoLink: 'any_video_link',
-    createdAt: 1234567890,
-    updatedAt: 1234567890
-}
+const document: VideoProcessing = new VideoProcessing(
+    new Email('any_valid@mail.com'),
+    'any_zip_link',
+    'any_video_link',
+    'IN_PROGRESS',
+    'any_bucket_key',
+    10,
+    1234567890,
+    1234567890
+)
 
-const anotherDocument: VideoProcessing = {
-    email: new Email('any_valid@mail.com'),
-    bucketKey: 'another_bucket_key',
-    interval: 5,
-    status: 'COMPLETED',
-    zipLink: 'any_zip_link',
-    videoLink: 'any_video_link',
-    createdAt: 1234567890,
-    updatedAt: 1234567890
-}
+const anotherDocument: VideoProcessing = new VideoProcessing(
+    new Email('any_valid@mail.com'),
+    'any_zip_link',
+    'any_video_link',
+    'COMPLETED',
+    'another_bucket_key',
+    5,
+    1234567890,
+    1234567890
+)
 
 const mockCollectionMethods = {
     aggregate: (filter: any) => {

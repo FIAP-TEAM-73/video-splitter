@@ -3,16 +3,16 @@ import { IVideoProcessingGateway } from "../../../src/domain/gateways/IVideoProc
 import FindVideoProcessingUseCase from "../../../src/domain/usecases/FindVideoProcessingUseCase";
 import Email from "../../../src/domain/value-objects/email";
 
-const document: VideoProcessing = {
-    email: new Email('any_valid@mail.com'),
-    bucketKey: 'any_bucket_key',
-    interval: 10,
-    status: 'IN_PROGRESS',
-    zipLink: 'any_zip_link',
-    videoLink: 'any_zip_link',
-    createdAt: 1234567890,
-    updatedAt: 1234567890
-}
+const document: VideoProcessing = new VideoProcessing(
+    new Email('any_valid@mail.com'),
+    'any_zip_link',
+    'any_video_link',
+    'IN_PROGRESS',
+    'any_bucket_key',
+    10,
+    1234567890,
+    1234567890
+)
 
 describe('Find VideoProcessing Use Case', () => {
     const mockVideoProcessingGateway: IVideoProcessingGateway = {

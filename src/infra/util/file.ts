@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import AdmZip from 'adm-zip';
 import { Readable } from 'stream';
 
-export const storeTmpFile = async (buffer: unknown, filePath: string, outputFolder): Promise<void> => {
+export const storeTmpFile = async (buffer: unknown, filePath: string, outputFolder: string): Promise<void> => {
     console.log('Storing file in:', { filePath, outputFolder });
     fs.ensureDirSync(outputFolder);
     const readableStream = buffer as Readable;

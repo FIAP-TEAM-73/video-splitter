@@ -1,25 +1,15 @@
-import { getBoundary, parse } from 'parse-multipart-data';
+import { ApiEventHandler } from './handler.types';
+import { badRequest, HttpResponse, internalServerError, noContent } from '../presenters/HttpResponses';
+import { getUploadVideoProcessingUseCase } from '../domain/factories/useCaseFactory';
 
-export const uploadVideoHandler = async (event) => {
-    const { filename, data } = extractFile(event)
-    console.log({ filename, data })
-    return {
-        statusCode: 200,
-        body: JSON.stringify(
-            { filename, data },
-            null,
-            2
-        ),
-    };
+export const uploadVideoHandler = async (event: ApiEventHandler<string>): Promise<HttpResponse> => {
+  try {
+    if (!event.body) return badRequest('Invalid request body!');
+    const command = JSON.parse(event.body);
+    const useCase = getUploadVideoProcessingUseCase();
+    await useCase.execute(command);
+    return noContent();
+  } catch (error) {
+    return internalServerError('Error while uploading a video', error);
+  }  
 };
-
-const extractFile = (event) => {
-    const boundary = getBoundary(event.headers['content-type'])
-    const parts = parse(Buffer.from(event.body, 'base64'), boundary);
-    const [{ filename, data }] = parts
-
-    return {
-        filename,
-        data
-    }
-}

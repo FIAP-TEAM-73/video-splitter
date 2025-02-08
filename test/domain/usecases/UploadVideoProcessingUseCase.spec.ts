@@ -11,6 +11,8 @@ const mockCommand = {
     createdAt: Date.now()
 }
 
+const bucketKey = `${mockCommand.email}/${mockCommand.createdAt}.mp4`
+
 const repositoryMock: jest.Mocked<IVideoProcessingGateway> = {
     findByKey: jest.fn(),
     save: jest.fn(),
@@ -35,13 +37,13 @@ describe('UploadVideoProcessingUseCase', () => {
             videoLink: mockCommand.videoLink,
             status: 'IN_PROGRESS',
             updatedAt: expect.anything(),
-            bucketkey: undefined,
+            bucketKey,
             zipLink: undefined
         });
     });
     it('Should dispatch VideoProcessing with success', async () => {
         const { email, videoLink, createdAt, interval } = mockCommand;
-        const video = new VideoProcessing(new Email(email), undefined, videoLink, "IN_PROGRESS", undefined, interval, createdAt, createdAt)
+        const video = new VideoProcessing(new Email(email), undefined, videoLink, "IN_PROGRESS", bucketKey, interval, createdAt, createdAt)
         const sut = setup(repositoryMock, producerMock)
         await sut.execute(mockCommand)
         expect(producerMock.send).toHaveBeenCalledWith({

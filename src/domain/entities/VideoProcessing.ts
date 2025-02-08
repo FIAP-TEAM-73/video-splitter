@@ -18,4 +18,16 @@ export default class VideoProcessing {
         assertArgumentUnionType(status, Object.values(statuses), `Invalid status: ${status}`);
         assertMinNumber(interval, 1);
     }
+
+    isInProgress(): boolean {
+        return this.status === statuses[0]
+    }
+
+    turnToCompleted(zipLink: string, changeTime: number = Date.now()): VideoProcessing {
+        return new VideoProcessing(this.email, zipLink, this.videoLink, statuses[1], this.bucketKey,this.interval, this.createdAt, changeTime)
+    }
+
+    turnToError(changeTime: number = Date.now()): VideoProcessing {
+        return new VideoProcessing(this.email, this.zipLink, this.videoLink, statuses[2], this.bucketKey,this.interval, this.createdAt, changeTime)
+    }
 }

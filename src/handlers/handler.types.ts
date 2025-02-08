@@ -17,3 +17,9 @@ export type S3EventHandler = {
         }
     }[];
 }
+
+export type SQSEventHandler = {
+    Records: {
+        body: string
+    }[]
+}

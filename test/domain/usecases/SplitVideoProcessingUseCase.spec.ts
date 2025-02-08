@@ -49,16 +49,16 @@ describe('SplitVideoProcessingUseCase', () => {
         filePath: '/tmp/video.mp4',
     };
 
-    const mockVideoProcessing: VideoProcessing = {
-        interval: 5,
-        status: 'IN_PROGRESS',
-        bucketKey: mockInput.bucketKey,
-        createdAt: Date.now(),
-        email: new Email('valid@mail.com'),
-        updatedAt: Date.now(),
-        zipLink: 'zip/path.zip',
-        videoLink: 'zip/path.zip'
-    };
+    const mockVideoProcessing: VideoProcessing = new VideoProcessing(
+        new Email('valid@mail.com'),
+        'zip/path.zip',
+        'zip/path.zip',
+        'IN_PROGRESS',
+        mockInput.bucketKey,
+        5,
+        Date.now(),
+        Date.now(),
+    );
 
     it('should process video successfully', async () => {
         const mockBody = Buffer.from('test');

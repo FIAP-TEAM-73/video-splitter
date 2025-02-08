@@ -23,7 +23,7 @@ describe('signupHandler', () => {
     it('should return bad request if body is not provided', async () => {
         const event = { ...mockEvent, body: undefined };
         const response = await signupHandler(event);
-        expect(response).toEqual(badRequest('Environment variable user_pool_id not set'));
+        expect(response).toEqual(badRequest('Error to Sign Up user. Body must be informed.'));
     });
 
     it('should return no content if signup is successful', async () => {
@@ -38,6 +38,6 @@ describe('signupHandler', () => {
         const error = new Error('Signup failed');
         mockUseCase.execute.mockRejectedValue(error);
         const response = await signupHandler(event);
-        expect(response).toEqual(internalServerError('Error while signing up an User', error));
+        expect(response).toEqual(internalServerError('Error to Sign Up user', error));
     });
 });
