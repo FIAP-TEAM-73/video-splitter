@@ -25,7 +25,7 @@ export class DownloadVideoProcessingUseCase {
         if (!video) throw new Error(`Cannot download video because there isn't any request IN_PROGRESS. Key: ${bucketKey}`)
         try {
             if (!video.isInProgress()) throw new Error(`Cannot start the download. Current status is different of IN_PROGRESS. Key: ${bucketKey}`)
-            const videoIsValid = this.validateVideoSize(videoLink);
+            const videoIsValid = await this.validateVideoSize(videoLink);
             if (!videoIsValid) return;
             const fileName = path.join('/tmp', path.basename('video.mp4'));
             await this.downloadVideo(videoLink, fileName);

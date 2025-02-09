@@ -1,4 +1,3 @@
-import { ReadStream } from "fs";
 import IEmail from "../../infra/smtp/IEmail";
 import { IStorage } from "../../infra/storage/IStorage";
 import { createZipFile, readTmpFile, storeTmpFile } from "../../infra/util/file";
@@ -33,8 +32,9 @@ export default class SplitVideoProcessingUseCase {
             console.log(`Video duration is ${duration}s`);
             await this.storeFrames(filePath, outputFolder, duration, videoProcessing.interval);
             await createZipFile(outputFolder, zipFilePath);
+            const key = `zip/${videoProcessing.email.value}/${videoProcessing.createdAt}`;
             const file = await readTmpFile(zipFilePath);
-            await this.storage.put<{ Key: string, Body: Buffer }, PutObjectCommandOutput>({ Key: zipFilePath, Body: file });
+            await this.storage.put<{ Key: string, Body: Buffer }, PutObjectCommandOutput>({ Key: key, Body: file });
             const zipLink = this.getZipLink(sourceBucket, zipFilePath);
             await this.repository.save(videoProcessing.turnToCompleted(zipLink))
         } catch (error) {

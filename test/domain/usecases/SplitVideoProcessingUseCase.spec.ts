@@ -63,6 +63,7 @@ describe('SplitVideoProcessingUseCase', () => {
         const mockDuration = 10;
         const mockInterval = 5;
         const mockFile = Buffer.from('zip');
+        const key = `zip/${mockVideoProcessing.email.value}/${mockVideoProcessing.createdAt}`;
         storageMock.get.mockResolvedValue({ Body: mockBody });
         videoMock.getDuration.mockResolvedValue({ duration: mockDuration });
         repositoryMock.findByKey.mockResolvedValue(mockVideoProcessing);
@@ -76,7 +77,7 @@ describe('SplitVideoProcessingUseCase', () => {
         expect(videoMock.getDuration).toHaveBeenCalledWith(mockInput.filePath);
         expect(videoMock.storeFrames).toHaveBeenCalledTimes(2);
         expect(fileUtils.createZipFile).toHaveBeenCalledWith(mockInput.outputFolder, mockInput.zipFilePath);
-        expect(storageMock.put).toHaveBeenCalledWith({ Key: mockInput.zipFilePath, Body: mockFile });
+        expect(storageMock.put).toHaveBeenCalledWith({ Key: key, Body: mockFile });
         expect(repositoryMock.save).toHaveBeenCalledWith(expect.objectContaining({
             status: 'COMPLETED',
             interval: mockInterval,

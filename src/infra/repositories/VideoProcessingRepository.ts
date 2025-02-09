@@ -37,7 +37,7 @@ export default class VideoProcessingRepository implements IVideoProcessingGatewa
     async find({ email, page, size }: VideoProcessingParams): Promise<VideoProcessing[]> {
         const pipeline = [
             {
-                $match: { "email": { value: email } }
+                $match: { "email.value": email }
             },
             {
                 $sort: { createdAt: -1 }
@@ -49,6 +49,7 @@ export default class VideoProcessingRepository implements IVideoProcessingGatewa
                 $limit: +size
             }
         ]
+        console.log({ pipeline: JSON.stringify(pipeline) });
         const collection = await this.connection.getCollection("video_processing");
         const result = await collection.aggregate(pipeline).toArray();
         if (result.length === 0) return [];
