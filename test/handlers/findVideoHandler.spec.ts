@@ -32,6 +32,54 @@ describe('findVideoProcessingHandler', () => {
         expect(response).toEqual(badRequest(`Invalid query string parameters: ${JSON.stringify(event.queryStringParameters)}`));
     });
 
+    it('should return bad request if page is invalid', async () => {
+        const event = { ...mockEvent, queryStringParameters: { page: '-1', size: '1', email: 'test@example.com' } };
+        const response = await findVideoProcessingHandler(event);
+        expect(response).toEqual(badRequest(`Invalid query string parameters: ${JSON.stringify(event.queryStringParameters)}`));
+    });
+
+    it('should return bad request if size is invalid', async () => {
+        const event = { ...mockEvent, queryStringParameters: { page: '1', size: '-1', email: 'test@example.com' } };
+        const response = await findVideoProcessingHandler(event);
+        expect(response).toEqual(badRequest(`Invalid query string parameters: ${JSON.stringify(event.queryStringParameters)}`));
+    });
+
+    it('should return bad request if page is not a parameter', async () => {
+        const event = { ...mockEvent, queryStringParameters: { size: '1', email: 'test@example.com' } };
+        const response = await findVideoProcessingHandler(event);
+        expect(response).toEqual(badRequest(`Invalid query string parameters: ${JSON.stringify(event.queryStringParameters)}`));
+    });
+
+    it('should return bad request if size is not a parameter', async () => {
+        const event = { ...mockEvent, queryStringParameters: { page: '1', email: 'test@example.com' } };
+        const response = await findVideoProcessingHandler(event);
+        expect(response).toEqual(badRequest(`Invalid query string parameters: ${JSON.stringify(event.queryStringParameters)}`));
+    });
+
+    it('should return bad request if email is not a parameter', async () => {
+        const event = { ...mockEvent, queryStringParameters: { page: '1', size: '1' } };
+        const response = await findVideoProcessingHandler(event);
+        expect(response).toEqual(badRequest(`Invalid query string parameters: ${JSON.stringify(event.queryStringParameters)}`));
+    });
+
+    it('should return bad request if page is undefined', async () => {
+        const event = { ...mockEvent, queryStringParameters: { page: undefined, size: '1', email: 'test@example.com' } };
+        const response = await findVideoProcessingHandler(event as any);
+        expect(response).toEqual(badRequest(`Invalid query string parameters: ${JSON.stringify(event.queryStringParameters)}`));
+    });
+
+    it('should return bad request if size is undefined', async () => {
+        const event = { ...mockEvent, queryStringParameters: { page: '1', size: undefined, email: 'test@example.com' } };
+        const response = await findVideoProcessingHandler(event as any);
+        expect(response).toEqual(badRequest(`Invalid query string parameters: ${JSON.stringify(event.queryStringParameters)}`));
+    });
+
+    it('should return bad request if email is undefined', async () => {
+        const event = { ...mockEvent, queryStringParameters: { page: '1', email: undefined, size: '1' } };
+        const response = await findVideoProcessingHandler(event as any);
+        expect(response).toEqual(badRequest(`Invalid query string parameters: ${JSON.stringify(event.queryStringParameters)}`));
+    });
+
     it('should return ok if query string parameters are valid', async () => {
         const event = { ...mockEvent, queryStringParameters: { page: '1', size: '10', email: 'test@example.com' } };
         const mockBody = { data: 'some data' };

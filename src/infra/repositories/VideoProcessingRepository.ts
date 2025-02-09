@@ -43,7 +43,7 @@ export default class VideoProcessingRepository implements IVideoProcessingGatewa
                 $sort: { createdAt: -1 }
             },
             {
-                $skip: page * size
+                $skip: (page === 0) ? page * size : (page - 1) * size
             },
             {
                 $limit: +size

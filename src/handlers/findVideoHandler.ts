@@ -40,5 +40,7 @@ const validateParams = (value: unknown): value is { page: number, size: number, 
     if (!page || (typeof page === 'string' && isNaN(+page))) return false;
     if (!size || (typeof size === 'string' && isNaN(+size))) return false;
     if (!email) return false;
+    if (+page < 0) return false;
+    if (+size < 0) return false;
     return true
 }
