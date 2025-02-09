@@ -30,8 +30,8 @@ describe('splitVideoHandler', () => {
         expect(getSplitVideoProcessingUseCase).toHaveBeenCalledWith('source-bucket');
         expect(mockUseCase.execute).toHaveBeenCalledWith({
             sourceBucket: 'source-bucket',
-            bucketKey: 'video.mp4',
-            outPutFolder: '/tmp/Images',
+            objectKey: 'video.mp4',
+            outputFolder: '/tmp/Images',
             zipFilePath: '/tmp/images.zip',
             filePath: '/tmp/video.mp4'
         });

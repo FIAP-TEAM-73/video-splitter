@@ -4,7 +4,6 @@ import { Readable } from 'stream';
 
 export const storeTmpFile = async (buffer: unknown, filePath: string, outputFolder: string): Promise<void> => {
     console.log('Storing file in:', { filePath, outputFolder });
-    fs.ensureDirSync(outputFolder);
     const readableStream = buffer as Readable;
     await new Promise((resolve, reject) => {
         const writeStream = fs.createWriteStream(filePath);
@@ -13,6 +12,8 @@ export const storeTmpFile = async (buffer: unknown, filePath: string, outputFold
         writeStream.on('finish', resolve);
         writeStream.on('error', reject);
     });
+    const stats = await fs.promises.stat(filePath);
+    console.log(`File saved. File size: ${stats.size} bytes.`);
 };
 
 export const createZipFile = async (folderPath: string, zipFilePath: string): Promise<void> => {
@@ -21,6 +22,6 @@ export const createZipFile = async (folderPath: string, zipFilePath: string): Pr
     zip.writeZip(zipFilePath);
 }
 
-export const readTmpFile = async (filePath: string): Promise<fs.ReadStream> => {
-    return fs.createReadStream(filePath);
+export const readTmpFile = async (filePath: string): Promise<Buffer> => {
+    return await fs.readFile(filePath)
 }

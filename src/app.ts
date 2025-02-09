@@ -1,9 +1,10 @@
-import { uploadVideoHandler, splitVideoHandler, findVideoProcessingHandler, loginHandler, signupHandler } from "./handlers";
+import { uploadVideoHandler, splitVideoHandler, findVideoProcessingHandler, loginHandler, signupHandler, downloadVideoHandler } from "./handlers";
 
 export const handler = {
   uploadVideo: uploadVideoHandler,
   splitVideo: splitVideoHandler,
   findVideo: findVideoProcessingHandler,
   login: loginHandler,
-  signup: signupHandler
+  signup: signupHandler,
+  downloadVideo: downloadVideoHandler
 };

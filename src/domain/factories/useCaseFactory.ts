@@ -63,6 +63,10 @@ export const getLoginUseCase = (): LoginUseCase => new LoginUseCase(getAuthGatew
 
 export const getSignUpUseCase = (): SignUpUseCase => new SignUpUseCase(getAuthGateway())
 
-export const getUploadVideoProcessingUseCase = (): UploadVideoProcessingUseCase => new UploadVideoProcessingUseCase(videoProcessingMongoRepository, producer);
+export const getUploadVideoProcessingUseCase = (): UploadVideoProcessingUseCase => {
+    return new UploadVideoProcessingUseCase(videoProcessingMongoRepository, producer);
+}
 
-export const getDownloadVideoProcessingUseCase = (bucket: string): DownloadVideoProcessingUseCase => new DownloadVideoProcessingUseCase(videoProcessingMongoRepository, getStorage(bucket))
+export const getDownloadVideoProcessingUseCase = (bucket: string): DownloadVideoProcessingUseCase => {
+    return new DownloadVideoProcessingUseCase(videoProcessingMongoRepository, getStorage(bucket), mailer)
+}

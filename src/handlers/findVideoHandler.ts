@@ -6,6 +6,7 @@ import { ApiEventHandler } from './handler.types';
 
 export const findVideoProcessingHandler = async (event: ApiEventHandler): Promise<APIGatewayProxyResult> => {
     try {
+        console.log(`Receiving event on findVideoProcessingHandler. Event: ${JSON.stringify(event, null, 2)}`);
         if (!event.queryStringParameters) {
             return badRequest('Missing query string parameters');
         }
@@ -18,7 +19,7 @@ export const findVideoProcessingHandler = async (event: ApiEventHandler): Promis
         }
         return badRequest(`Invalid query string parameters: ${JSON.stringify(event.queryStringParameters)}`);
     } catch (error) {
-        console.error(`Error during processing: ${error?.message ?? JSON.stringify(error)}`);
+        console.error(`Error during processing: ${error?.message ?? JSON.stringify(error, null, 2)}`);
         if (error instanceof DomainError) {
             return badRequest(error.message, error);
         }

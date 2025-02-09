@@ -145,7 +145,7 @@ functions:
     image:
       name: splitvideos
       command:
-        - index.handler.uploadVideoConsumer
+        - index.handler.downloadVideo
     events:
       - sqs:
           arn:

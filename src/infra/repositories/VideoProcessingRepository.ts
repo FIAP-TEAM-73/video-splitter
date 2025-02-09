@@ -37,10 +37,10 @@ export default class VideoProcessingRepository implements IVideoProcessingGatewa
     async find({ email, page, size }: VideoProcessingParams): Promise<VideoProcessing[]> {
         const pipeline = [
             {
-                $match: email
+                $match: { "email": { value: email } }
             },
             {
-                $sort: { sortKey: 1, createdAt: -1 }
+                $sort: { createdAt: -1 }
             },
             {
                 $skip: page * size

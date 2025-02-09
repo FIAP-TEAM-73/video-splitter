@@ -1,14 +1,10 @@
 import { assertEmail } from "../base/AssertionConcerns";
 
 export default class Email {
-    private readonly email: string;
+    readonly value: string;
 
     constructor(email: string) {
         assertEmail(email, `Invalid email: ${email}`);
-        this.email = email;
-    }
-
-    get value(): string {
-        return this.email;
+        this.value = email;
     }
 }

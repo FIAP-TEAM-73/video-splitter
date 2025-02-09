@@ -2,8 +2,11 @@ import https from 'https'
 import { IncomingMessage } from 'http';
 import { IVideoProcessingGateway } from '../gateways/IVideoProcessingGateway';
 import { IStorage } from '../../infra/storage/IStorage';
-import fs from 'fs'
-import { readTmpFile } from '../../infra/util/file';
+import { readTmpFile, storeTmpFile } from '../../infra/util/file';
+import IEmail from '../../infra/smtp/IEmail';
+import path from 'path';
+import { PutObjectCommandOutput } from '@aws-sdk/client-s3';
+import { ReadStream } from 'fs';
 
 type DownloadVideoCommand = {
     videoLink: string,
@@ -12,18 +15,32 @@ type DownloadVideoCommand = {
 
 export class DownloadVideoProcessingUseCase {
 
-    constructor(private readonly repository: IVideoProcessingGateway, private readonly storage: IStorage) { }
+    constructor(
+        private readonly repository: IVideoProcessingGateway,
+        private readonly storage: IStorage,
+        private readonly mailer: IEmail) { }
 
     async execute({ videoLink, bucketKey }: DownloadVideoCommand): Promise<void> {
         const video = await this.repository.findByKey(bucketKey);
         if (!video) throw new Error(`Cannot download video because there isn't any request IN_PROGRESS. Key: ${bucketKey}`)
-        if (!video.isInProgress()) throw new Error(`Cannot start the download. Current status is different of IN_PROGRESS. Key: ${bucketKey}`)
-        const videoIsValid = this.validateVideoSize(videoLink);
-        if (!videoIsValid) return;
-        const fileName = bucketKey;
-        await this.downloadVideo(videoLink, fileName);
-        const file = readTmpFile(fileName);
-        await this.storage.put(file);
+        try {
+            if (!video.isInProgress()) throw new Error(`Cannot start the download. Current status is different of IN_PROGRESS. Key: ${bucketKey}`)
+            const videoIsValid = this.validateVideoSize(videoLink);
+            if (!videoIsValid) return;
+            const fileName = path.join('/tmp', path.basename('video.mp4'));
+            await this.downloadVideo(videoLink, fileName);
+            const file = await readTmpFile(fileName);
+            await this.storage.put<{ Key: string, Body: Buffer }, PutObjectCommandOutput>({ Key: bucketKey, Body: file });
+        } catch (error) {
+            await this.repository.save(video.turnToError())
+            await this.mailer.send(
+                video.email.value,
+                'Error processing video',
+                `Error processing video: ${error.message}. Key: ${bucketKey}`,
+            );
+            throw new Error(`Error processing video: ${error.message}. Key: ${bucketKey}`);
+        }
+
     }
 
     private validateVideoSize(url: string): Promise<boolean> {
@@ -48,21 +65,15 @@ export class DownloadVideoProcessingUseCase {
     private downloadVideo(url: string, fileName: string): Promise<void> {
         console.log(`Starting download from URL: ${url}`);
         return new Promise((resolve, reject) => {
-            https.get(url, (res: IncomingMessage) => {
+            https.get(url, async (res: IncomingMessage) => {
                 try {
-                    const writeStream = fs.createWriteStream(fileName);
-                    res.pipe(writeStream);
-                    writeStream.on("finish", () => {
-                        writeStream.close()
-                        console.log("Download Completed!")
-                        resolve();
-                    })
+                    await storeTmpFile(res, fileName, `/tmp`);
+                    resolve()
                 } catch (error) {
                     const message = `Error while download on URL:${url}. Reason: ${error.message ?? JSON.stringify(error)}`
                     console.log(message);
                     reject(new Error(message))
                 }
-
             });
         });
     }

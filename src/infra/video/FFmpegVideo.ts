@@ -3,8 +3,9 @@ import ffmpeg from 'fluent-ffmpeg';
 import path from 'path';
 
 export default class FFmpegVideo implements IVideo {
-    
+
     async getDuration(videoPath: string): Promise<{ duration: number }> {
+        console.log(`Getting durantion from ${videoPath}`);
         return new Promise((resolve, reject) => {
             ffmpeg(videoPath).ffprobe((err, metadata) => {
                 if (err) {
@@ -17,6 +18,7 @@ export default class FFmpegVideo implements IVideo {
     }
 
     async storeFrames({ path: videoPath, frameTime, outputPath }: StoreFramesParams): Promise<void> {
+        console.log(`captureFrame with videoPath ${videoPath}, outputPath ${outputPath}, frameTime ${frameTime}`);
         await new Promise((resolve, reject) => {
             ffmpeg(videoPath)
                 .screenshots({

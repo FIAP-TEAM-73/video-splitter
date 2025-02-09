@@ -22,8 +22,8 @@ export class DispachMail implements IEmail {
             text: body
         };
         try {
-            await this.transporter.sendMail(mailOptions);
-            console.log(`Email sent to ${to} successfully sent`);
+            const res = await this.transporter.sendMail(mailOptions);
+            console.log(`Email sent to ${to} successfully sent. Response: ${JSON.stringify(res, null, 2)}`);
         } catch (error) {
             console.error('Error sending email:', error);
         }

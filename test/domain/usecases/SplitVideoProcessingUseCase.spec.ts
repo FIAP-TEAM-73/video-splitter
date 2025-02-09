@@ -5,8 +5,6 @@ import { IVideo } from '../../../src/infra/video/IVideo';
 import * as fileUtils from '../../../src/infra/util/file';
 import VideoProcessing from '../../../src/domain/entities/VideoProcessing';
 import Email from '../../../src/domain/value-objects/email';
-import { Readable } from 'stream';
-import fs from 'fs-extra';
 import IEmail from '../../../src/infra/smtp/IEmail';
 
 jest.mock('../../../src/infra/util/file');
@@ -42,10 +40,10 @@ describe('SplitVideoProcessingUseCase', () => {
     );
 
     const mockInput = {
-        outPutFolder: '/tmp/output',
+        outputFolder: '/tmp/output',
         zipFilePath: 'zip/path.zip',
         sourceBucket: 'bucket',
-        bucketKey: 'key.mp4',
+        objectKey: 'key.mp4',
         filePath: '/tmp/video.mp4',
     };
 
@@ -54,7 +52,7 @@ describe('SplitVideoProcessingUseCase', () => {
         'zip/path.zip',
         'zip/path.zip',
         'IN_PROGRESS',
-        mockInput.bucketKey,
+        mockInput.objectKey,
         5,
         Date.now(),
         Date.now(),
@@ -64,7 +62,7 @@ describe('SplitVideoProcessingUseCase', () => {
         const mockBody = Buffer.from('test');
         const mockDuration = 10;
         const mockInterval = 5;
-        const mockFile = Readable.from(Buffer.from('zip')) as fs.ReadStream;
+        const mockFile = Buffer.from('zip');
         storageMock.get.mockResolvedValue({ Body: mockBody });
         videoMock.getDuration.mockResolvedValue({ duration: mockDuration });
         repositoryMock.findByKey.mockResolvedValue(mockVideoProcessing);
@@ -73,11 +71,11 @@ describe('SplitVideoProcessingUseCase', () => {
         jest.spyOn(fileUtils, 'readTmpFile').mockResolvedValue(mockFile);
         const sut = setup();
         await sut.execute(mockInput);
-        expect(storageMock.get).toHaveBeenCalledWith({ Key: mockInput.bucketKey });
-        expect(fileUtils.storeTmpFile).toHaveBeenCalledWith(mockBody, mockInput.filePath, mockInput.outPutFolder);
-        expect(videoMock.getDuration).toHaveBeenCalledWith(mockInput.bucketKey);
+        expect(storageMock.get).toHaveBeenCalledWith({ Key: mockInput.objectKey });
+        expect(fileUtils.storeTmpFile).toHaveBeenCalledWith(mockBody, mockInput.filePath, mockInput.outputFolder);
+        expect(videoMock.getDuration).toHaveBeenCalledWith(mockInput.filePath);
         expect(videoMock.storeFrames).toHaveBeenCalledTimes(2);
-        expect(fileUtils.createZipFile).toHaveBeenCalledWith(mockInput.outPutFolder, mockInput.zipFilePath);
+        expect(fileUtils.createZipFile).toHaveBeenCalledWith(mockInput.outputFolder, mockInput.zipFilePath);
         expect(storageMock.put).toHaveBeenCalledWith({ Key: mockInput.zipFilePath, Body: mockFile });
         expect(repositoryMock.save).toHaveBeenCalledWith(expect.objectContaining({
             status: 'COMPLETED',
@@ -97,7 +95,7 @@ describe('SplitVideoProcessingUseCase', () => {
         storageMock.get.mockRejectedValue(new Error('Error'));
         mailerMock.send.mockResolvedValue();
         const sut = setup();
-        await expect(sut.execute(mockInput)).rejects.toThrow(`Error processing video: Error. Key: ${mockInput.bucketKey}`);
+        await expect(sut.execute(mockInput)).rejects.toThrow(`Error processing video: Error. Key: ${mockInput.objectKey}`);
         expect(repositoryMock.save).toHaveBeenCalledWith(expect.objectContaining({
             status: 'ERROR',
             interval: 5
@@ -108,7 +106,7 @@ describe('SplitVideoProcessingUseCase', () => {
         storageMock.get.mockRejectedValue(new Error('Error'));
         mailerMock.send.mockResolvedValue();
         const sut = setup();
-        await expect(sut.execute(mockInput)).rejects.toThrow(`Error processing video: Error. Key: ${mockInput.bucketKey}`);
-        expect(mailerMock.send).toHaveBeenCalledWith(mockVideoProcessing.email.value, 'Error processing video', `Error processing video: Error. Key: ${mockInput.bucketKey}`);
+        await expect(sut.execute(mockInput)).rejects.toThrow(`Error processing video: Error. Key: ${mockInput.objectKey}`);
+        expect(mailerMock.send).toHaveBeenCalledWith(mockVideoProcessing.email.value, 'Error processing video', `Error processing video: Error. Key: ${mockInput.objectKey}`);
     });
 });

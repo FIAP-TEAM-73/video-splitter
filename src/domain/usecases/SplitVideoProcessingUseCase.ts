@@ -8,9 +8,9 @@ import { GetObjectCommandOutput, PutObjectCommandOutput } from '@aws-sdk/client-
 import path from 'path';
 
 type SplitVideoProcessingCommandInput = {
-    outPutFolder: string,
+    outputFolder: string,
     zipFilePath: string,
-    bucketKey: string,
+    objectKey: string,
     filePath: string,
     sourceBucket: string
 }
@@ -23,17 +23,18 @@ export default class SplitVideoProcessingUseCase {
         private readonly mailer: IEmail
     ) { }
 
-    async execute({ sourceBucket, bucketKey, outPutFolder, zipFilePath, filePath }: SplitVideoProcessingCommandInput): Promise<void> {
-        const videoProcessing = await this.repository.findByKey(bucketKey);
+    async execute({ sourceBucket, objectKey, outputFolder, zipFilePath, filePath }: SplitVideoProcessingCommandInput): Promise<void> {
+        const videoProcessing = await this.repository.findByKey(objectKey);
         if (!videoProcessing) throw new Error('Video processing not found');
         try {
-            const { Body } = await this.storage.get<{ Key: string }, GetObjectCommandOutput>({ Key: bucketKey });
-            await storeTmpFile(Body, filePath, outPutFolder);
-            const { duration } = await this.video.getDuration(bucketKey);
-            await this.storeFrames(filePath, outPutFolder, duration, videoProcessing.interval);
-            await createZipFile(outPutFolder, zipFilePath);
+            const { Body } = await this.storage.get<{ Key: string }, GetObjectCommandOutput>({ Key: objectKey });
+            await storeTmpFile(Body, filePath, outputFolder);
+            const { duration } = await this.video.getDuration(filePath);
+            console.log(`Video duration is ${duration}s`);
+            await this.storeFrames(filePath, outputFolder, duration, videoProcessing.interval);
+            await createZipFile(outputFolder, zipFilePath);
             const file = await readTmpFile(zipFilePath);
-            await this.storage.put<{ Key: string, Body: ReadStream }, PutObjectCommandOutput>({ Key: zipFilePath, Body: file });
+            await this.storage.put<{ Key: string, Body: Buffer }, PutObjectCommandOutput>({ Key: zipFilePath, Body: file });
             const zipLink = this.getZipLink(sourceBucket, zipFilePath);
             await this.repository.save(videoProcessing.turnToCompleted(zipLink))
         } catch (error) {
@@ -41,9 +42,9 @@ export default class SplitVideoProcessingUseCase {
             await this.mailer.send(
                 videoProcessing.email.value,
                 'Error processing video',
-                `Error processing video: ${error.message}. Key: ${bucketKey}`,
+                `Error processing video: ${error.message}. Key: ${objectKey}`,
             );
-            throw new Error(`Error processing video: ${error.message}. Key: ${bucketKey}`);
+            throw new Error(`Error processing video: ${error.message}. Key: ${objectKey}`);
         }
     }
 

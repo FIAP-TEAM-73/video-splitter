@@ -11,7 +11,7 @@ const mockCommand = {
     createdAt: Date.now()
 }
 
-const bucketKey = `${mockCommand.email}/${mockCommand.createdAt}.mp4`
+const bucketKey = `videos/${mockCommand.email}/${mockCommand.createdAt}.mp4`
 
 const repositoryMock: jest.Mocked<IVideoProcessingGateway> = {
     findByKey: jest.fn(),

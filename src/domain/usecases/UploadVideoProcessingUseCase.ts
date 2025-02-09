@@ -15,7 +15,7 @@ export class UploadVideoProcessingUseCase {
     constructor(private readonly repository: IVideoProcessingGateway, private readonly producer: IProducerGateway) { }
 
     async execute({ videoLink, email, interval, createdAt = Date.now() }: UploadVideoCommand): Promise<void> {
-        const bucketKey = `${email}/${createdAt}.mp4`
+        const bucketKey = `videos/${email}/${createdAt}.mp4`
         const videoProcessing = new VideoProcessing(new Email(email), undefined, videoLink, "IN_PROGRESS", bucketKey, interval, createdAt, createdAt)
         await this.repository.save(videoProcessing);
         const event: ProducerEvent = {

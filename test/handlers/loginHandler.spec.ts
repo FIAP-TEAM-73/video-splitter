@@ -48,6 +48,6 @@ describe('loginHandler', () => {
         const response = await loginHandler(event);
 
         expect(mockUseCase.execute).toHaveBeenCalledWith({ email: 'test@example.com', password: 'password123' });
-        expect(response).toEqual(internalServerError('Error while signing up an User', mockError));
+        expect(response).toEqual(internalServerError('Error to login user', mockError));
     });
 });
