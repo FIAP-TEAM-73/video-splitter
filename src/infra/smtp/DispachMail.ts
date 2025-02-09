@@ -12,7 +12,15 @@ export type DispachMailParams = {
 export class DispachMail implements IEmail {
     private readonly transporter: Transporter;
     constructor({ host, port, user, pass }: DispachMailParams) {
-        this.transporter = createTransport({ host, port, auth: { user, pass }, secure: true } as Options);
+        this.transporter = createTransport(
+            {
+                host,
+                port,
+                auth: { user, pass },
+                secure: true,
+                requireTLS: true,
+                secured: true
+            } as Options);
     }
     async send(to: string, subject: string, body: string): Promise<void> {
         const mailOptions = {

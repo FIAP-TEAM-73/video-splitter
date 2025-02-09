@@ -32,11 +32,11 @@ export default class SplitVideoProcessingUseCase {
             console.log(`Video duration is ${duration}s`);
             await this.storeFrames(filePath, outputFolder, duration, videoProcessing.interval);
             await createZipFile(outputFolder, zipFilePath);
-            const key = `zip/${videoProcessing.email.value}/${videoProcessing.createdAt}`;
+            const key = `zip/${videoProcessing.email.value}/${videoProcessing.createdAt}.zip`;
             const file = await readTmpFile(zipFilePath);
             await this.storage.put<{ Key: string, Body: Buffer }, PutObjectCommandOutput>({ Key: key, Body: file });
-            const zipLink = this.getZipLink(sourceBucket, zipFilePath);
-            await this.repository.save(videoProcessing.turnToCompleted(zipLink))
+            const zipLink = this.getZipLink(sourceBucket, key);
+            await this.repository.save(videoProcessing.turnToCompleted(zipLink));
         } catch (error) {
             await this.repository.save(videoProcessing.turnToError())
             await this.mailer.send(

@@ -63,7 +63,7 @@ describe('SplitVideoProcessingUseCase', () => {
         const mockDuration = 10;
         const mockInterval = 5;
         const mockFile = Buffer.from('zip');
-        const key = `zip/${mockVideoProcessing.email.value}/${mockVideoProcessing.createdAt}`;
+        const key = `zip/${mockVideoProcessing.email.value}/${mockVideoProcessing.createdAt}.zip`;
         storageMock.get.mockResolvedValue({ Body: mockBody });
         videoMock.getDuration.mockResolvedValue({ duration: mockDuration });
         repositoryMock.findByKey.mockResolvedValue(mockVideoProcessing);
@@ -81,7 +81,7 @@ describe('SplitVideoProcessingUseCase', () => {
         expect(repositoryMock.save).toHaveBeenCalledWith(expect.objectContaining({
             status: 'COMPLETED',
             interval: mockInterval,
-            zipLink: 'https://bucket.s3.us-east-1.amazonaws.com/zip/path.zip'
+            zipLink: `https://bucket.s3.us-east-1.amazonaws.com/${key}`
         }));
     });
     it('Should throw error when video processing not found', async () => {
