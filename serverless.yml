@@ -1,0 +1,155 @@
+service: processing-videos
+
+frameworkVersion: "4"
+
+resources:
+  Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: download-video-queue
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: serverless-auth-pool
+        Schema:
+          - Name: email
+            Required: true
+            Mutable: true
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 6
+        AutoVerifiedAttributes: ["email"]
+    UserClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: user-pool-ui
+        GenerateSecret: false
+        UserPoolId: { Ref: UserPool }
+        AccessTokenValidity: 5
+        IdTokenValidity: 5
+        ExplicitAuthFlows:
+          - "ADMIN_NO_SRP_AUTH"
+
+provider:
+  runtime: nodejs22.x
+  timeout: 30
+  environment:
+    USER_POOL_ID: { Ref: UserPool }
+    CLIENT_ID: { Ref: UserClient }
+    QUEUE: { Ref: SQSQueue }
+    DB_USER: ${param:db_user}
+    DB_PASSWORD: ${param:db_password}
+    DB_NAME: ${param:db_name}
+    SMTP_HOST: ${param:smtp_host}
+    SMTP_USER: ${param:smtp_user}
+    SMTP_PASS: ${param:smtp_pass}
+    BUCKET_NAME: short-videos-test-1736807439669
+  iam:
+    role: arn:aws:iam::969036274708:role/LabRole
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminInitiateAuth
+        - cognito-idp:AdminSetUserPassword
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - sqs:SendMessage
+        - sqs:ReceiveMessage
+        - sqs:DeleteMessage
+        - sqs:GetQueueAttributes
+      Resource:
+        - "Fn::GetAtt": [ SQSQueue, Arn ] 
+  name: aws
+  ecr:
+    scanOnPush: true
+    images:
+      splitvideos:
+        uri: ${param:image_uri}
+  region: us-east-1
+
+functions:
+  loginUser:
+    image:
+      name: splitvideos
+      command:
+        - index.handler.login
+    events:
+      - http:
+          path: user/login
+          method: post
+          cors: true
+
+  signupUser:
+    image:
+      name: splitvideos
+      command:
+        - index.handler.signup
+    events:
+      - http:
+          path: user/signup
+          method: post
+          cors: true
+  splitVideos:
+    image:
+      name: splitvideos
+      command:
+        - index.handler.splitVideo
+    events:
+      - s3:
+          bucket: short-videos-test-1736807439669
+          rules:
+            - prefix: videos/
+            - suffix: .mp4
+          event: s3:ObjectCreated:*
+  uploadVideo:
+    image:
+      name: splitvideos
+      command:
+        - index.handler.uploadVideo
+    events:
+      - http:
+          path: video
+          method: post
+          authorizer: 
+            name: VideoProcessingAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: 
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  findVideo:
+    image:
+      name: splitvideos
+      command:
+        - index.handler.findVideo
+    events:
+      - http:
+          path: video
+          method: get
+          authorizer: 
+            name: VideoProcessingAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: 
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+
+  uploadVideoConsumer:
+    image:
+      name: splitvideos
+      command:
+        - index.handler.downloadVideo
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - SQSQueue
+              - Arn
+          batchSize: 5
