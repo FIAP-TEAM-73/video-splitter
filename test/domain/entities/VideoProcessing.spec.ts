@@ -8,6 +8,7 @@ describe('Create VideoProcessing', () => {
         const sut = new VideoProcessing(email, 'any_zip_link', 'any_video_link', 'IN_PROGRESS', 'any_bucket_key', interval);
         expect(sut.zipLink).toBe('any_zip_link');
         expect(sut.status).toBe('IN_PROGRESS');
+        expect(sut.isInProgress()).toBe(true)
         expect(sut.bucketKey).toBe('any_bucket_key');
         expect(sut.interval).toBe(interval);
         expect(sut.email).toBe(email);

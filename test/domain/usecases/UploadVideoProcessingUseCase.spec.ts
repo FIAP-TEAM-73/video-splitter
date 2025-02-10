@@ -58,9 +58,10 @@ describe('UploadVideoProcessingUseCase', () => {
         await expect(sut.execute(mockCommand)).rejects.toEqual(new Error('Generic repository error'))
     });
     it('Should throw an error when producer throws', async () => {
+        const { email, videoLink, interval } = mockCommand;
         repositoryMock.save.mockResolvedValue();
         producerMock.send.mockRejectedValue(new Error('Generic producer error'));
         const sut = setup(repositoryMock, producerMock);
-        await expect(sut.execute(mockCommand)).rejects.toEqual(new Error('Generic producer error'));
+        await expect(sut.execute({ email, videoLink, interval })).rejects.toEqual(new Error('Generic producer error'));
     });
 });
