@@ -17,9 +17,6 @@ export class DispachMail implements IEmail {
                 host,
                 port,
                 auth: { user, pass },
-                secure: true,
-                requireTLS: true,
-                secured: true
             } as Options);
     }
     async send(to: string, subject: string, body: string): Promise<void> {
