@@ -17,8 +17,8 @@ A arquitetura escolhida é **Serverless na AWS**, utilizando os seguintes servi�
 
 ### 🔹 Fluxo da Aplicação
 1. O usuário faz login via **AWS Cognito**.
-2. Faz upload de um vídeo para o **Amazon S3**.
-3. A aplicação dispara um evento para uma **SQS**, processando o vídeo de forma assíncrona.
+2. O usuário envia as informações necessárias para realizar o download e upload do vídedo.
+3. A aplicação dispara um evento para uma **SQS**, baixando o vídeo e salvando-o no **S3** de forma assíncrona.
 4. O processamento extrai os frames e gera um arquivo `.zip`.
 5. O usuário pode verificar o status dos vídeos processados.
 6. Em caso de erro, uma notificação por **e-mail** é enviada.
