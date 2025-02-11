@@ -1,5 +1,5 @@
 import { IProducerGateway, ProducerEvent } from "../../domain/gateways/IProducerGateway";
-import { SQSClient, SendMessageCommand, SendMessageCommandOutput } from "@aws-sdk/client-sqs";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 export default class SQSProducer implements IProducerGateway {
     constructor(private readonly queue: string, private readonly client: SQSClient) { }
