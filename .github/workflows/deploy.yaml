@@ -138,7 +138,7 @@ jobs:
       - name: Install Dependencies
         run: npm ci && npm install -g serverless && echo "$(npm root -g)/.bin" >> $GITHUB_PATH
       - name: Deploy with Serverless
-        run: serverless deploy --param="image_uri=969036274708.dkr.ecr.us-east-1.amazonaws.com/andersonacdm/video-processing:merge"  --param="db_user=${{ env.DB_USER }}"  --param="db_password=${{ env.DB_PASSWORD }}" --param="db_name=${{ env.DB_NAME }}" --param="smtp_host=${{ env.SMTP_HOST }}" --param="smtp_user=${{ env.SMTP_USER }}" --param="smtp_pass=${{ env.SMTP_PASS }}"
+        run: serverless deploy --param="image_uri=${{env.FULL_IMAGE}}"  --param="db_user=${{ env.DB_USER }}"  --param="db_password=${{ env.DB_PASSWORD }}" --param="db_name=${{ env.DB_NAME }}" --param="smtp_host=${{ env.SMTP_HOST }}" --param="smtp_user=${{ env.SMTP_USER }}" --param="smtp_pass=${{ env.SMTP_PASS }}"
         env:
           SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
