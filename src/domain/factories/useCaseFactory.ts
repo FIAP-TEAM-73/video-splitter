@@ -39,7 +39,7 @@ const getAuthGateway = (): IAuthGateway => {
 
 const mailer = new DispachMail({
     host: process.env.SMTP_HOST ?? 'smtp.ethereal.email',
-    port: +(process.env.SMTP_PORT ?? 465),
+    port: +(process.env.SMTP_PORT ?? 587),
     user: process.env.SMTP_USER ?? 'abbey.marks13@ethereal.email',
     pass: process.env.SMTP_PASS ?? 'guy3WS1Mf6M1ynmW9r'
 })
